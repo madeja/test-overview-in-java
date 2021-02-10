@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Console\Commands\AnalyseAllProjects;
-use App\ProjectFramework;
 use App\ProjectMeta;
 use App\ProjectRealTestsStat;
 use Goutte\Client;
@@ -18,6 +17,51 @@ abstract class ProjectAnalyzer extends Command
     private $stat = null; // model to save results
 
     private $instanceNo;
+
+    const FRAMEWORK_IMPORTS = [
+        'junit3' => 'junit.framework',
+        'junit4' => 'org.junit',
+        'testng' => 'org.testng',
+        'artos' => 'com.artos',
+        'beanTest' => 'info.novatec.bean-test',
+        'cunit' => 'edu.rice.cs.cunit',
+        'grandTestAuto' => 'org.GrandTestAuto',
+        'arquillian' => 'org.jboss.arquillian',
+        'etlunit' => 'org.bitbucket.bradleysmithllc.etlunit',
+        'havarunner' => 'com.github.havarunner',
+        'jexample' => 'ch.unibe.jexample',
+        'jnario' => 'org.jnario',
+        'assertj' => 'org.assertj',
+        'hamcrest' => 'org.hamcrest',
+        'xmlunit' => 'org.xmlunit',
+        'beanSpec' => 'org.beanSpec',
+        'cactus' => 'org.apache.cactus',
+        'concordion' => 'org.concordion',
+        'cucumber' => 'io.cucumber',
+        'cuppa' => 'org.forgerock.cuppa',
+        'dbunit' => 'org.dbunit',
+        'easyMock' => 'org.easymock.EasyMock',
+        'groboutils' => 'net.sourceforge.groboutils',
+        'jbehave' => 'org.jbehave',
+        'jdave' => 'org.jdave',
+        'jgiven' => 'com.tngtech.jgiven',
+        'jmock' => 'org.jmock',
+        'jmockit' => 'org.jmockit',
+        'jukito' => 'org.jukito',
+        'junitee' => 'org.junitee',
+        'mockito' => 'org.mockito',
+        'mockrunner' => 'com.mockrunner',
+        'needle' => 'de.akquinet.jbosscc.needle',
+        'openpojo' => 'com.openpojo',
+        'powermock' => 'org.powermock',
+        'spock' => 'spock.lang',
+        'springframework' => 'org.springframework.test',
+        'selenide' => 'com.codeborne.selenide',
+        'serenitybdd' => 'net.serenitybdd',
+        'selenium' => 'org.openqa.selenium',
+        'robotframework' => 'org.robotframework',
+        'tellurium' => 'org.tellurium',
+    ];
 
     public function process(Collection $projects, int $instanceNo) : void
     {
@@ -205,7 +249,7 @@ abstract class ProjectAnalyzer extends Command
     {
         $files = new Collection();
         $totalNoOfTests = 0;
-        foreach (ProjectFramework::IMPORTS as $framework => $import) $frameworks_occurrence[$framework] = 0;
+        foreach (self::FRAMEWORK_IMPORTS as $framework => $import) $frameworks_occurrence[$framework] = 0;
         $ratios = null;
         foreach ($agData as $line){
             $lineParts = explode(':', $line); // parsing line output of 'ag'
@@ -335,7 +379,7 @@ abstract class ProjectAnalyzer extends Command
             $ratios[] = [$testOccurrences, $numberOfTests];
 
             // count framework occurrence
-            foreach (ProjectFramework::IMPORTS as $framework => $import) {
+            foreach (self::FRAMEWORK_IMPORTS as $framework => $import) {
                 $frameworks_occurrence[$framework] += preg_match_all("/".$import."/", $fileContent ,$match);
             }
         }
